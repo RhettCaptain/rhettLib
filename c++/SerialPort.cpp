@@ -459,13 +459,14 @@ int SerialPort::readline(char* buffer,int len,char eol){
 }
 
 int SerialPort::readline(string &buffer,int len,char eol){
-	char* cBuffer = new char(len);
+	char* cBuffer = new char[len];
 	int nBytes = readline(cBuffer,len,eol);
 	if(nBytes == -1){
 		return -1;
 	}
 	else{
 		buffer.insert(0,cBuffer,nBytes);
+		delete[] cBuffer;
 		return nBytes;
 	}
 }
