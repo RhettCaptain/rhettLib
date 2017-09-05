@@ -9,8 +9,14 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <errno.h>
+#include <string>
+#include <vector>
 
-using namespace std;
+typedef unsigned int uchar;
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
 
 class SerialPort
 {
@@ -61,7 +67,18 @@ public:
 	char getOutMode();
 
 	int readPort(char* buffer,int len);
-	int writePort(char* buffer,int len);
+	int readPort(string &buffer,int len=100);
+	string readPort2str(int len=100);
+	int readPort(vector<uchar> &buffer,int len=100);
+	vector<uchar> readPort2vec(int len=100);
+	int readline(char* buffer,int len,char eol='\n');
+	int readline(string &buffer,int len=100,char eol='\n');
+	string readline(int len=100,char eol='\n');
+	
+	int writePort(const char* buffer,int len);
+	int writePort(const string &buffer);
+	int writePort(const vector<uchar> &buffer);
+	
 
 	void flush();
 	void inFlush();

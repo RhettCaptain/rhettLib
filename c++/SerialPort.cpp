@@ -1,7 +1,6 @@
 #include "SerialPort.h"
 
 
-
 SerialPort::SerialPort(const char* pPortName)
 {
 	fd = -1;
@@ -406,17 +405,107 @@ int SerialPort::readPort(char* buffer, int len)
 	return nBytes;
 }
 
+int SerialPort::readPort(string &buffer,int len){
+	char* cBuffer = new char[len];
+	int nBytes = readPort(cBuffer,len);
+	if(nBytes == -1){
+		return -1;
+	}
+	else{
+		buffer.insert(0,cBuffer,nBytes);
+		return nBytes;
+	}
+}
 
-int SerialPort::writePort(char* buffer, int len)
-{
-	if(fd == -1)
-	{
+string SerialPort::readPort2str(int len){
+	string buffer;
+	readPort(buffer,len);
+	return buffer;
+}
+
+int SerialPort::readPort(vector<uchar> &buffer,int len){
+	char* cBuffer = new char[len];
+	int nBytes = readPort(cBuffer,len);
+	if(nBytes == -1){
+		return -1;
+	}
+	else{
+		for(int i=0;i<nBytes;i++){
+			buffer.push_back((uchar)cBuffer[i]);
+		}
+		return nBytes;
+	}
+}
+
+vector<uchar> SerialPort::readPort2vec(int len){
+	vector<uchar> vec;
+	readPort(vec,len);
+	return vec;
+}
+
+int SerialPort::readline(char* buffer,int len,char eol){
+	char ch=' ';
+	int idx=0;
+	while(ch!=eol){
+		if(readPort(&ch,1)>0){
+			buffer[idx++] = ch;		
+		}
+		if(idx==len){
+			cout << "no eol in len bytes" << endl;
+			break;
+		}
+	}
+	return idx;
+}
+
+int SerialPort::readline(string &buffer,int len,char eol){
+	char* cBuffer = new char(len);
+	int nBytes = readline(cBuffer,len,eol);
+	if(nBytes == -1){
+		return -1;
+	}
+	else{
+		buffer.insert(0,cBuffer,nBytes);
+		return nBytes;
+	}
+}
+
+string SerialPort::readline(int len,char eol){
+	string buffer;
+	readline(buffer,len,eol);
+	return buffer;
+}
+
+int SerialPort::writePort(const char* buffer, int len){
+	if(fd == -1){
 		cout << "please open port first\n";
 		return -1;
 	}
 	int nBytes = write(fd,buffer,len);
+	return nBytes;
 }
 
+int SerialPort::writePort(const string &buffer){
+	if(fd == -1){
+		cout << "please open port first\n";
+		return -1;
+	}
+	for(int i=0;i<buffer.size();i++){
+		write(fd,&buffer[i],1);
+	}
+	return buffer.size();
+}
+
+int SerialPort::writePort(const vector<uchar> &buffer){
+	if(fd == -1){
+		cout << "please open port first\n";
+		return -1;
+	}
+	for(int i=0;i<buffer.size();i++){
+		write(fd,&buffer[i],1);
+	}
+	return buffer.size();
+}
 
 void SerialPort::flush()
 {
