@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-typedef unsigned int uchar;
+typedef unsigned char uchar;
 using std::vector;
 using std::string;
 using std::cout;
