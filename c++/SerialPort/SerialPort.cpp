@@ -428,12 +428,14 @@ int SerialPort::readPort(vector<uchar> &buffer,int len){
 	buffer.resize(len);
 	int nBytes = readPort(cBuffer,len);
 	if(nBytes == -1){
+		delete[] cBuffer;
 		return -1;
 	}
 	else{
 		for(int i=0;i<nBytes;i++){
 			buffer[i] = (uchar)cBuffer[i];
 		}
+		delete[] cBuffer;
 		return nBytes;
 	}
 }
@@ -457,6 +459,7 @@ int SerialPort::readline(string &buffer,int len,char eol){
 	char* cBuffer = new char[len];
 	int nBytes = readline(cBuffer,len,eol);
 	if(nBytes == -1){
+		delete[] cBuffer;
 		return -1;
 	}
 	else{
