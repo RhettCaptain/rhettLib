@@ -4,13 +4,16 @@
 #include <sys/types.h>
 #include <sys/socket.h> 
 #include <sys/un.h>
-#include <sys/in.h>
+#include <netinet/in.h>
 #include <string>
 #include <cstring>
 #include <vector>
 #include <iostream>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-class SocketServer(){
+class SocketServer{
 private:
 	int serverFd;
 	struct sockaddr_un unAddr;
@@ -19,14 +22,15 @@ private:
 	std::vector<int> clientsFd;
 	int clientsCount;
 	std::vector<struct sockaddr> clientsAddr;
-	std::vecotr<int> clientsAddrLen;
+	std::vector<socklen_t> clientsAddrLen;
 
 public:
 	SocketServer(const char* type = "TCP");
 	SocketServer(int domain,int type,int protocol=0);
 	void setAddr(const char* fileName);
 	void setAddr(const char* ip,unsigned short int port);
-	bool accept(int vol=5,bool block = true);
+	void listenClient(int vol=5);
+	bool acceptClient(bool block = true);
 	int getClientsCount();
 	struct sockaddr getClientAddr(int idx);
 	void clearClient(int idx=-1);
@@ -40,12 +44,37 @@ public:
 	
 	int writeSock(const char* buffer,int len,int clientIdx=0);
 	int writeSock(const std::string &buffer,int clientIdx = 0);
-
+	
+	bool closeServer(int how=SHUT_RDWR);
+	bool closeClient(int idx=-1,int how=SHUT_RDWR);
 
 private:
 };
 
-class SocketClient(){
+class SocketClient{
+private:
+	int clientFd;
+
+	struct sockaddr_un serverUnAddr;
+	struct sockaddr_in serverInAddr;
+public:
+	SocketClient(const char* type ="TCP");
+	SocketClient(int domain,int type,int protocol=0);
+	bool connectServer(const char* fileName);
+	bool connectServer(const char* ip,unsigned short int port);
+	
+	void setBlock(bool on);
+	
+	int readSock(char* buffer, int len);
+	int readSock(std::string &buffer, int len=100);
+	int readline(char* buffer,int len,char eol='\n');
+	int readline(std::string &buffer,int len=100,char eol='\n');
+
+	int writeSock(const char* buffer,int len);
+	int writeSock(const std::string &buffer);
+
+	bool close(int how=SHUT_RDWR);
+private:
 };
 
 
