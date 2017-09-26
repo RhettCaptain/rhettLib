@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <fstream>
 
 class SocketServer{
 private:
@@ -41,13 +42,15 @@ public:
 	int readSock(std::string &buffer, int len=100,int clientIdx=0);
 	int readline(char* buffer,int len,char eol='\n',int clientIdx=0);
 	int readline(std::string &buffer,int len=100,char eol='\n',int clientIdx=0);
+	int recFile(const char* dstPath,int clientIdx=0);
 	
 	int writeSock(const char* buffer,int len,int clientIdx=0);
 	int writeSock(const std::string &buffer,int clientIdx = 0);
+	int sendFile(const char* srcPath,int clientIdx=0);
 	
 	bool closeServer(int how=SHUT_RDWR);
 	bool closeClient(int idx=-1,int how=SHUT_RDWR);
-
+	
 private:
 };
 
@@ -69,9 +72,11 @@ public:
 	int readSock(std::string &buffer, int len=100);
 	int readline(char* buffer,int len,char eol='\n');
 	int readline(std::string &buffer,int len=100,char eol='\n');
+	int recFile(const char* dstPath);
 
 	int writeSock(const char* buffer,int len);
 	int writeSock(const std::string &buffer);
+	int sendFile(const char* srcPath);
 
 	bool close(int how=SHUT_RDWR);
 private:

@@ -1,5 +1,12 @@
 #include "Socket.h"
 
+using std::ifstream;
+using std::ofstream;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::ios_base;
+
 //implement of SocketServer
 SocketServer::SocketServer(const char* type){
 	if(strcmp(type,"TCP") == 0){
@@ -154,6 +161,17 @@ int SocketServer::readline(std::string &buffer,int len,char eol,int clientIdx){
 	}
 }
 
+int SocketServer::recFile(const char* dstPath,int clientIdx){
+	std::string fileContext;
+	ofstream fout;
+	fout.open(dstPath,ios_base::out|ios_base::trunc);
+	readline(fileContext,10000,EOF,clientIdx);
+	fileContext.erase(fileContext.end()-1);
+	fout << fileContext;
+	fout.close();
+	return fileContext.length();
+}
+
 int SocketServer::writeSock(const char* buffer,int len,int clientIdx){
 	int sock = clientsFd[clientIdx];
 	int nBytes = write(sock,buffer,len);
@@ -168,6 +186,16 @@ int SocketServer::writeSock(const std::string &buffer, int clientIdx){
 	return buffer.size();
 }
 
+int SocketServer::sendFile(const char* srcPath, int clientIdx){
+	ifstream fin;
+	fin.open(srcPath);
+	std::string fileContext;
+	getline(fin,fileContext,(char)EOF);
+	fileContext += EOF;
+	writeSock(fileContext,clientIdx);
+	fin.close(); 
+	return fileContext.length()-1;
+}
 bool SocketServer::closeServer(int how){
 	if( shutdown(serverFd,how) == -1){
 		return false;
@@ -300,6 +328,16 @@ int SocketClient::readline(std::string &buffer,int len,char eol){
 	}
 }
 
+int SocketClient::recFile(const char* dstPath){
+	std::string fileContext;
+	ofstream fout;
+	fout.open(dstPath,ios_base::out|ios_base::trunc);
+	readline(fileContext,10000,EOF);
+	fileContext.erase(fileContext.end()-1);
+	fout << fileContext;
+	fout.close();
+	return fileContext.length();
+}
 int SocketClient::writeSock(const char* buffer,int len){
 	int nBytes = write(clientFd,buffer,len);
 	return nBytes;
@@ -312,6 +350,15 @@ int SocketClient::writeSock(const std::string &buffer){
 	return buffer.size();
 }
 
+int SocketClient::sendFile(const char* srcPath){
+	std::string fileContext;
+	ifstream fin;
+	fin.open(srcPath);
+	getline(fin,fileContext,(char)EOF);
+	fileContext += EOF;
+	writeSock(fileContext);
+	return fileContext.length()-1;
+}
 bool SocketClient::close(int how){
 	if( shutdown(clientFd,how) == -1){
 		return false;

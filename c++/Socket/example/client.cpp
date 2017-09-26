@@ -8,13 +8,16 @@ int main(){
 		cout << "not connect" << endl;
 	}
 	cout << "connected" << endl;
-	while(1){
+/*	while(1){
 		string send,get;
 		send = "i'm client,send 2 server\n";
 		sc.writeSock(send);
 		sc.readline(get);
 		cout << "get: " << get << endl;
 		sleep(1);
-	}
+	}*/
+	sc.sendFile("clientFile");
+	cout << "send over" << endl;
+	sc.recFile("clientFile");
 	sc.close();
 }
