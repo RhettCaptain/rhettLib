@@ -1,7 +1,7 @@
-#include "SerialPort.h"
+#include "../SerialPort.h"
 
 int main(){
-	SerialPort* sp = new SerialPort("/dev/ttyS1"); 
+	SerialPort* sp = new SerialPort("/dev/ttyUSB2"); 
 	sp->openPort();
 	sp->setPort();
 }
